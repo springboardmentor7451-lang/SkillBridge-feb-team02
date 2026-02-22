@@ -1,302 +1,295 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { signup } from "../../services/api";
+import useAuth from "../../context/useAuth";
+import FormField from "../ui/FormField";
 
-const SignupForm = ({ onSuccess, switchToLogin }) => {
+const SignupForm = ({ switchToLogin, onSuccess }) => {
+  const { loginUser } = useAuth();
+
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    name: "",
-    username:"",
-    email: "",
-    password: "",
-    role: "volunteer", // default role
-    skills: [], // for volunteer
-    bio: "", // for volunteer
-    location: "",
-    organization_name: "", // for ngo
-    organization_description: "", // for ngo
-    website: "", // for ngo
-  });
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const [form, setForm] = useState({
+    name: "",
+    username: "",
+    email: "",
+    role: "",
+    bio: "",
+    location: "",
+    skills: [],
+    skillInput: "",
+    organization_name: "",
+    organization_description: "",
+    website: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const step1Fields = [
+    { label: "Full Name", name: "name" },
+    { label: "Username", name: "username" },
+    { label: "Email", name: "email", type: "email" },
+    {
+      label: "Role",
+      name: "role",
+      type: "select",
+      options: [
+        { label: "Volunteer", value: "volunteer" },
+        { label: "NGO", value: "ngo" },
+      ],
+    },
+  ];
+
+  const volunteerFields = [
+    { label: "Bio", name: "bio", type: "textarea" },
+    { label: "Location", name: "location" },
+  ];
+
+  const ngoFields = [
+    { label: "Organization Name", name: "organization_name" },
+    {
+      label: "Organization Description",
+      name: "organization_description",
+      type: "textarea",
+    },
+    { label: "Website", name: "website" },
+    { label: "Location", name: "location" },
+  ];
+
+  const step3Fields = [
+    { label: "Password", name: "password", type: "password" },
+    { label: "Confirm Password", name: "confirmPassword", type: "password" },
+  ];
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
-  const handleSkillsChange = (e) => {
-    // Simple comma-separated string to array for now
-    const skillsArray = e.target.value.split(",").map((skill) => skill.trim());
-    setFormData({ ...formData, skills: skillsArray });
+  const addSkill = () => {
+    const skill = form.skillInput.trim();
+    if (skill && !form.skills.includes(skill)) {
+      setForm((prev) => ({
+        ...prev,
+        skills: [...prev.skills, skill],
+        skillInput: "",
+      }));
+    }
   };
 
-  const validateStep1 = () => {
-    const required = ["name", "email", "password", "role"];
-    for (const field of required) {
-      if (!formData[field]) {
-        setError(`Please fill in ${field}`);
-        return false;
+  const handleSkillKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addSkill();
+    }
+  };
+
+  const removeSkill = (skill) => {
+    setForm((prev) => ({
+      ...prev,
+      skills: prev.skills.filter((s) => s !== skill),
+    }));
+  };
+
+  const validateStep = () => {
+    if (step === 1) {
+      if (!form.name || !form.username || !form.email || !form.role) {
+        return "Please fill all required fields.";
       }
     }
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return false;
+
+    if (step === 2) {
+      if (form.role === "volunteer" && !form.bio) {
+        return "Bio is required for volunteers.";
+      }
+
+      if (
+        form.role === "ngo" &&
+        (!form.organization_name || !form.organization_description)
+      ) {
+        return "Organization name and description are required for NGOs.";
+      }
     }
-    setError("");
-    return true;
+
+    if (step === 3) {
+      if (!form.password || !form.confirmPassword) {
+        return "Please enter password and confirm it.";
+      }
+
+      if (form.password !== form.confirmPassword) {
+        return "Passwords do not match.";
+      }
+    }
+
+    return null;
   };
 
-  const handleNext = (e) => {
-    e.preventDefault();
-    if (validateStep1()) {
-      setStep(2);
+  const handleNext = () => {
+    const validationError = validateStep();
+    if (validationError) {
+      setError(validationError);
+      return;
     }
-  };
 
-  const handleBack = () => {
-    setStep(1);
     setError("");
+    setStep(step + 1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+
+    const validationError = validateStep();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     try {
-      const data = await signup(formData);
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-        onSuccess(data);
-      } else {
-        setError(data.message || "Signup failed");
-      }
+      setLoading(true);
+
+      const payload = {
+        name: form.name,
+        username: form.username,
+        email: form.email,
+        role: form.role,
+        bio: form.bio,
+        location: form.location,
+        skills: form.skills.length ? form.skills : undefined,
+        organization_name: form.organization_name,
+        organization_description: form.organization_description,
+        website: form.website,
+        password: form.password,
+      };
+
+      await signup(payload);
+
+      loginUser({ email: form.email, password: form.password });
+      onSuccess();
     } catch (err) {
-      setError(
-        err.response?.data?.message || "An error occurred. Please try again.",
-      );
+      setError(err.response?.data?.message || "Signup failed.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full flex flex-col justify-center my-auto">
-      <div className="mb-6 shrink-0">
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">
-          Create Account
-        </h2>
-        <p className="text-slate-500 text-sm md:text-base">
-          {step === 1 ? "Step 1: Basic Information" : "Step 2: Profile Details"}
-        </p>
+    <div className="w-full max-w-md mx-auto">
+      <div className="mb-6 text-center">
+        <h2 className="text-2xl font-bold text-slate-900">Create Account</h2>
+        <p className="text-sm text-slate-500">Step {step} of 3</p>
       </div>
 
-      <form
-        className="flex flex-col gap-4 grow overflow-y-auto px-1"
-        onSubmit={handleSubmit}
-      >
-        {step === 1 && (
-          <div className="flex flex-col gap-4 animate-[fadeIn_0.3s_ease-out]">
-            <div className="grid grid-cols-2 gap-3" >
-            <label className="text-sm font-semibold text-slate-600 ml-1">
-              Full Name
-              <input
-                type="text"
-                name="name"
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-sm md:text-base"
-                placeholder="John Doe"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </label>
-            <label className="text-sm font-semibold text-slate-600 ml-1">
-              Username
-              <input
-                type="text"
-                name="username"
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-sm md:text-base"
-                placeholder="johnoe123"
-                value={formData.username}
-                onChange={handleChange}
-                required
-              />
-            </label>
-            </div>
+      {error && (
+        <div className="mb-4 px-4 py-3 rounded-lg bg-amber-50 border border-amber-300 text-amber-700 text-sm">
+          ⚠ {error}
+        </div>
+      )}
 
-            <label className="text-sm font-semibold text-slate-600 ml-1">
-              Email Address
-              <input
-                type="email"
-                name="email"
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-sm md:text-base"
-                placeholder="name@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </label>
-
-            <label className="text-sm font-semibold text-slate-600 ml-1">
-              Password
-              <input
-                type="password"
-                name="password"
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-sm md:text-base"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </label>
-
-            <label className="text-sm font-semibold text-slate-600 ml-1">
-              I am a
-              <select
-                name="role"
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-sm md:text-base appearance-none cursor-pointer"
-                value={formData.role}
-                onChange={handleChange}
-              >
-                <option value="volunteer">Volunteer</option>
-                <option value="ngo">NGO</option>
-              </select>
-            </label>
-          </div>
-        )}
-        {error && (
-          <div className="text-red-500 text-sm text-center">{error}</div>
-        )}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {step === 1 &&
+          step1Fields.map((field) => (
+            <FormField
+              key={field.name}
+              {...field}
+              value={form[field.name]}
+              onChange={handleChange}
+            />
+          ))}
 
         {step === 2 && (
-          <div className="flex flex-col gap-4 animate-[fadeIn_0.3s_ease-out]">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-slate-600 ml-1">
-                Location
-              </label>
-              <input
-                type="text"
-                name="location"
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-sm md:text-base"
-                placeholder="City, Country"
-                value={formData.location}
-                onChange={handleChange}
-              />
-            </div>
+          <>
+            {(form.role === "volunteer" ? volunteerFields : ngoFields).map(
+              (field) => (
+                <FormField
+                  key={field.name}
+                  {...field}
+                  value={form[field.name]}
+                  onChange={handleChange}
+                />
+              ),
+            )}
 
-            {formData.role === "volunteer" && (
+            {form.role === "volunteer" && (
               <>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-slate-600 ml-1">
-                    Bio
-                  </label>
-                  <textarea
-                    name="bio"
-                    className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-sm md:text-base resize-none"
-                    placeholder="Tell us about yourself"
-                    rows="3"
-                    value={formData.bio}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-slate-600 ml-1">
-                    Skills (comma separated)
-                  </label>
-                  <input
-                    type="text"
-                    name="skillsInput" // uncontrolled input helper
-                    className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-sm md:text-base"
-                    placeholder="Teaching, Coding, Cooking"
-                    onChange={handleSkillsChange}
-                  />
+                <FormField
+                  label="Add Skill"
+                  name="skillInput"
+                  value={form.skillInput}
+                  onChange={handleChange}
+                  onKeyDown={handleSkillKeyDown}
+                  placeholder="Type skill and press Enter"
+                />
+
+                <div className="flex flex-wrap gap-2">
+                  {form.skills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm flex items-center gap-2"
+                    >
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() => removeSkill(skill)}
+                        className="text-red-500 text-xs"
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  ))}
                 </div>
               </>
             )}
-
-            {formData.role === "ngo" && (
-              <>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-slate-600 ml-1">
-                    Organization Name
-                  </label>
-                  <input
-                    type="text"
-                    name="organization_name"
-                    className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-sm md:text-base"
-                    placeholder="Your Organization"
-                    value={formData.organization_name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <label className="text-sm font-semibold text-slate-600 ml-1">
-                  Description
-                  <textarea
-                    name="organization_description"
-                    className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-sm md:text-base resize-none"
-                    placeholder="What does your NGO do?"
-                    rows="2"
-                    value={formData.organization_description}
-                    onChange={handleChange}
-                    required
-                  />
-                </label>
-
-                <label className="text-sm font-semibold text-slate-600 ml-1">
-                  Website
-                  <input
-                    type="text"
-                    name="website"
-                    className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-sm md:text-base"
-                    placeholder="https://example.org"
-                    value={formData.website}
-                    onChange={handleChange}
-                  />
-                </label>
-              </>
-            )}
-          </div>
+          </>
         )}
-        <div className=" flex flex-col gap-3 shrink-0">
-          {step === 1 ? (
+        
+        {step === 3 &&
+          step3Fields.map((field) => (
+            <FormField
+              key={field.name}
+              {...field}
+              value={form[field.name]}
+              onChange={handleChange}
+            />
+          ))}
+
+        <div className="flex gap-3 pt-2">
+          {step > 1 && (
+            <button
+              type="button"
+              onClick={() => setStep(step - 1)}
+              className="w-1/2 border border-slate-300 py-2 rounded-lg"
+            >
+              Back
+            </button>
+          )}
+
+          {step < 3 ? (
             <button
               type="button"
               onClick={handleNext}
-              className="w-full py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
+              className="w-full bg-slate-900 text-white py-2 rounded-lg"
             >
-              Next
+              Continue
             </button>
           ) : (
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={handleBack}
-                className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors cursor-pointer"
-              >
-                Back
-              </button>
-              <button
-                type="submit"
-                className="flex-1 py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition-colors disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
-                disabled={loading}
-              >
-                {loading ? "Creating..." : "Sign Up"}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-slate-900 text-white py-2 rounded-lg disabled:opacity-60"
+            >
+              {loading ? "Creating..." : "Create Account"}
+            </button>
           )}
         </div>
       </form>
 
-      <div className="mt-6 text-center text-sm text-slate-500 shrink-0">
-        Already have an account?
-        <button
-          className="text-indigo-600 font-semibold cursor-pointer border-none bg-transparent ml-1 hover:underline p-0"
-          onClick={switchToLogin}
-          type="button"
-        >
-          Log In
+      <div className="mt-4 text-center text-sm text-slate-600">
+        Already have an account?{" "}
+        <button onClick={switchToLogin} className="font-medium hover:underline">
+          Login
         </button>
       </div>
     </div>
