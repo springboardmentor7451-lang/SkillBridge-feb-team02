@@ -1,137 +1,113 @@
-import React, { useEffect, useState } from "react";
-import { getUserProfile } from "../services/api";
+import React, { useEffect } from "react";
+import useAuth from "../context/useAuth";
 
 const UserProfile = () => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+  const { user, logoutUser } = useAuth();
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const data = await getUserProfile();
-                if (data.success) {
-                    setUser(data.userData);
-                } else {
-                    setError("Failed to load profile");
-                }
-            } catch (err) {
-                console.error(err);
-                setError("An error occurred while fetching profile");
-            } finally {
-                setLoading(false);
-            }
-        };
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
-        fetchProfile();
-    }, []);
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="flex justify-center items-center h-screen text-red-500 font-semibold">
-                {error}
-            </div>
-        );
-    }
-
-    if (!user) {
-        return null;
-    }
-
+  if (!user) {
     return (
-        <div className="w-[90%] mt-30  mx-auto p-6 bg-white rounded-3xl shadow-lg border border-slate-100">
-            <div className="flex flex-col md:flex-row gap-8 items-start">
-                {/* Profile Header / Left Column */}
-                <div className="shrink-0 flex flex-col items-center">
-                    <div className="w-32 h-32 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-4xl border-4 border-indigo-50">
-                        {user.username ? user.username[0].toUpperCase() : "U"}
-                    </div>
-                    <h2 className="mt-4 text-2xl font-bold text-slate-800">{user.name}</h2>
-                    <p className="text-slate-500 text-sm">@{user.username}</p>
-                    <span className="mt-2 px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-full uppercase tracking-wide">
-                        {user.role}
-                    </span>
-                </div>
-
-                {/* Details / Right Column */}
-                <div className="grow w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="col-span-1 md:col-span-2">
-                        <h3 className="text-lg font-semibold text-slate-700 mb-3 border-b border-slate-100 pb-2">Contact Information</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Email</label>
-                                <p className="text-slate-800 font-medium">{user.email}</p>
-                            </div>
-                            <div>
-                                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Location</label>
-                                <p className="text-slate-800 font-medium">{user.location || "Not specified"}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {user.role === "volunteer" && (
-                        <div className="col-span-1 md:col-span-2">
-                            <h3 className="text-lg font-semibold text-slate-700 mb-3 border-b border-slate-100 pb-2">Volunteer Profile</h3>
-                            <div className="flex flex-col gap-4">
-                                <div>
-                                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bio</label>
-                                    <p className="text-slate-700 leading-relaxed">{user.bio}</p>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Skills</label>
-                                    <div className="flex flex-wrap gap-2 mt-1">
-                                        {user.skills && user.skills.length > 0 ? (
-                                            user.skills.map((skill, index) => (
-                                                <span key={index} className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium">
-                                                    {skill}
-                                                </span>
-                                            ))
-                                        ) : (
-                                            <p className="text-slate-400 text-sm italic">No skills listed</p>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {user.role === "ngo" && (
-                        <div className="col-span-1 md:col-span-2">
-                            <h3 className="text-lg font-semibold text-slate-700 mb-3 border-b border-slate-100 pb-2">Organization Details</h3>
-                            <div className="flex flex-col gap-4">
-                                <div>
-                                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Organization Name</label>
-                                    <p className="text-slate-800 font-medium">{user.organization_name}</p>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Description</label>
-                                    <p className="text-slate-700 leading-relaxed">{user.organization_description}</p>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Website</label>
-                                    <p className="text-indigo-600 font-medium hover:underline">
-                                        {user.website ? (
-                                            <a href={user.website} target="_blank" rel="noopener noreferrer">{user.website}</a>
-                                        ) : (
-                                            <span className="text-slate-400 italic">Not provided</span>
-                                        )}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-slate-500">Loading profile...</p>
+      </div>
     );
+  }
+
+  const userInitial = user?.name?.charAt(0)?.toUpperCase() || "U";
+
+  const joinedDate = new Date(user.createdAt).toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  return (
+    <section className="min-h-screen bg-zinc-100 pt-32 px-4 pb-12">
+      <div className="max-w-5xl mx-auto space-y-8">
+        <div className="bg-white rounded-2xl shadow-sm p-6 md:p-10">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+            <div className="w-32 h-32 rounded-full bg-slate-900 flex items-center justify-center text-white text-5xl font-bold shrink-0">
+              {userInitial}
+            </div>
+            <div className="flex-1 text-center md:text-left space-y-3">
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900">
+                  {user.name}
+                </h1>
+                <p className="text-slate-500">@{user.username}</p>
+              </div>
+
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                <span className="px-4 py-1 text-sm rounded-full bg-slate-900 text-white capitalize">
+                  {user.role}
+                </span>
+
+                {user.location && (
+                  <span className="px-4 py-1 text-sm rounded-full bg-slate-100 text-slate-700">
+                    📍 {user.location}
+                  </span>
+                )}
+
+                <span className="px-4 py-1 text-sm rounded-full bg-slate-100 text-slate-700">
+                  🗓 Joined {joinedDate}
+                </span>
+              </div>
+
+              <p className="text-slate-600 text-sm md:text-base">
+                {user.email}
+              </p>
+            </div>
+
+            <div className="w-full md:w-auto">
+              <button
+                onClick={logoutUser}
+                className="w-full md:w-auto px-6 py-2.5 rounded-full text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+
+          <div className="my-10 border-t border-slate-200" />
+
+          <div className="grid md:grid-cols-2 gap-10">
+            <div>
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-3">
+                About
+              </h3>
+              <p className="text-slate-700 leading-relaxed whitespace-pre-line">
+                {user.bio || "No bio added yet."}
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-3">
+                Skills
+              </h3>
+
+              {user.skills && user.skills.length > 0 ? (
+                <div className="flex flex-wrap gap-3">
+                  {user.skills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-500 text-sm">No skills added yet.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default UserProfile;

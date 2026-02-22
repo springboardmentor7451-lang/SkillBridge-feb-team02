@@ -1,105 +1,103 @@
 import React, { useState } from "react";
-import { login } from "../../services/api";
+import useAuth from "../../context/useAuth";
+import FormField from "../../components/ui/FormField";
 
-const LoginForm = ({ onSuccess, switchToSignup }) => {
-  const [formData, setFormData] = useState({
+const LoginForm = ({ switchToSignup, onSuccess }) => {
+  const { loginUser } = useAuth();
+
+  const [form, setForm] = useState({
     email: "",
     password: "",
   });
-  const [error, setError] = useState("");
+
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const fields = [
+    { label: "Email", name: "email", type: "email" },
+    { label: "Password", name: "password", type: "password" },
+  ];
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const validate = () => {
+    if (!form.email || !form.password) {
+      return "Please enter both email and password.";
+    }
+
+    return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
 
-    if (!formData.email || !formData.password) {
-      setError("Please fill in all fields.");
-      setLoading(false);
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     try {
-      const data = await login(formData);
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-        window.dispatchEvent(new Event("auth-change"));
-        onSuccess(data);
-      } else {
-        setError(data.message || "Login failed");
-      }
+      setLoading(true);
+      setError("");
+
+      await loginUser({
+        email: form.email,
+        password: form.password,
+      });
+
+      onSuccess();
     } catch (err) {
-      setError(
-        err.response?.data?.message || "An error occurred. Please try again.",
-      );
+      setError(err.response?.data?.message || "Invalid email or password.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">Welcome Back</h2>
-        <p className="text-slate-500">Log in to your account</p>
+    <div className="w-full max-w-md mx-auto">
+      <div className="mb-6 text-center">
+        <h2 className="text-2xl font-bold text-slate-900">Welcome Back</h2>
+        <p className="text-sm text-slate-500 mt-1">Login to your account</p>
       </div>
 
-      <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-slate-600 ml-1">
-            Email Address
-            <input
-              type="email"
-              name="email"
-              className="w-full px-5 py-3 rounded-full border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-base"
-              placeholder="name@example.com"
-              value={formData.email}
-              onChange={handleChange}
-
-            />
-          </label>
+      {error && (
+        <div className="mb-4 px-4 py-3 rounded-lg bg-amber-50 border border-amber-300 text-amber-700 text-sm">
+          ⚠ {error}
         </div>
+      )}
 
-        <label className="text-sm font-semibold text-slate-600 ml-1">
-          Password
-          <div className="relative flex items-center">
-            <input
-              type="password"
-              name="password"
-              className="w-full px-5 py-3 rounded-full border-2 border-slate-200 focus:border-indigo-500 focus:bg-white bg-slate-50 outline-none transition-all text-base"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-
-            />
-          </div>
-        </label>
-
-        {error && (
-          <div className="text-red-500 text-sm mt-1 text-center">{error}</div>
-        )}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {fields.map((field) => (
+          <FormField
+            key={field.name}
+            {...field}
+            value={form[field.name]}
+            onChange={handleChange}
+          />
+        ))}
 
         <button
           type="submit"
-          className="w-full py-3.5 bg-slate-900 text-white rounded-full font-semibold hover:bg-slate-800 transition-colors disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
           disabled={loading}
+          className="w-full bg-slate-900 text-white py-2.5 rounded-lg font-medium transition-colors hover:bg-slate-800 disabled:opacity-60"
         >
-          {loading ? "Logging in..." : "Log In"}
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
 
-      <div className="mt-8 text-center text-sm text-slate-500">
-        Don't have an account?
+      <div className="mt-4 text-center text-sm text-slate-600">
+        Don't have an account?{" "}
         <button
-          className="text-indigo-600 font-semibold cursor-pointer border-none bg-transparent ml-1 hover:underline p-0"
           onClick={switchToSignup}
+          className="font-medium hover:underline"
         >
-          Sign Up
+          Sign up
         </button>
       </div>
     </div>
