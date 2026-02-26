@@ -10,7 +10,7 @@ router.get("/me", (req, res) => {
   });
 });
 
-router.put("/me", authMiddleware, async (req, res) => {
+router.put("/me", async (req, res) => {
   try {
     const { email, role } = req.user;
 
