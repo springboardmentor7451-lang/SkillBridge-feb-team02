@@ -8,17 +8,12 @@
 
 **PR Checks:**
 
-### General
 - [ ] Code is properly formatted and follows project standards.
 - [ ] No linting or build errors.
 - [ ] Relevant logs and debug code are removed.
-
-### Frontend
 - [ ] No ESLint warnings.
 - [ ] UI changes are responsive (verified in responsive view).
 - [ ] UX considerations are met.
 - [ ] Assets are optimized for minimal file size.
-
-### Backend
 - [ ] Error handling and validations are implemented.
 - [ ] No breaking changes without proper versioning.
