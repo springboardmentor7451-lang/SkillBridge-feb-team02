@@ -4,106 +4,130 @@ const Opportunity = require("../models/opportunity");
 const authMiddleware = require("../middleware/jwtAuth");
 const authorizeRole = require("../middleware/authorizeRole");
 
+router.post("/", authMiddleware, authorizeRole("ngo"), async (req, res) => {
+  try {
+    const { title, description, required_skills, duration, location } =
+      req.body;
 
-// 🔹 CREATE OPPORTUNITY (NGO only)
-router.post(
-  "/",
-  authMiddleware,
-  authorizeRole("ngo"),
-  async (req, res) => {
-    try {
-      const { title, description, required_skills, duration, location } =
-        req.body;
-
-      const newOpportunity = await Opportunity.create({
-        ngo_id: req.user._id,
-        title,
-        description,
-        required_skills,
-        duration,
-        location,
-      });
-
-      res.status(201).json({
-        success: true,
-        message: "Opportunity created successfully",
-        opportunity: newOpportunity,
-      });
-    } catch (error) {
-      res.status(500).json({
+    if (!title || !description || !required_skills || !duration || !location) {
+      return res.status(400).json({
         success: false,
-        message: "Internal Server Error",
-        error,
+        message: "All fields are required",
       });
     }
+
+    const newOpportunity = await Opportunity.create({
+      ngo_id: req.user._id,
+      title: title.trim(),
+      description: description.trim(),
+      required_skills,
+      duration: duration.trim(),
+      location: location.trim(),
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Opportunity created successfully",
+      opportunity: newOpportunity,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error,
+    });
   }
-);
+});
 
+router.put("/:id", authMiddleware, authorizeRole("ngo"), async (req, res) => {
+  try {
+    const { id } = req.params;
 
-// 🔹 EDIT OPPORTUNITY (NGO only)
-router.put(
-  "/:id",
-  authMiddleware,
-  authorizeRole("ngo"),
-  async (req, res) => {
-    try {
-      const opportunity = await Opportunity.findById(req.params.id);
-
-      if (!opportunity) {
-        return res.status(404).json({
-          success: false,
-          message: "Opportunity not found",
-        });
-      }
-
-      // ensure NGO owns it
-      if (opportunity.ngo_id.toString() !== req.user._id.toString()) {
-        return res.status(403).json({
-          success: false,
-          message: "Not allowed to edit this opportunity",
-        });
-      }
-
-      Object.assign(opportunity, req.body);
-
-      await opportunity.save();
-
-      res.json({
-        success: true,
-        message: "Opportunity updated successfully",
-        opportunity,
-      });
-    } catch (error) {
-      res.status(500).json({
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
         success: false,
-        message: "Internal Server Error",
-        error,
+        message: "Invalid opportunity ID",
       });
     }
+
+    if (Object.keys(req.body).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No fields provided for update",
+      });
+    }
+
+    const opportunity = await Opportunity.findById(id);
+
+    if (!opportunity) {
+      return res.status(404).json({
+        success: false,
+        message: "Opportunity not found",
+      });
+    }
+
+    if (opportunity.ngo_id.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Not allowed to edit this opportunity",
+      });
+    }
+
+    const allowedFields = [
+      "title",
+      "description",
+      "required_skills",
+      "duration",
+      "location",
+      "status",
+    ];
+
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        opportunity[field] = req.body[field];
+      }
+    });
+
+    await opportunity.save();
+
+    res.json({
+      success: true,
+      message: "Opportunity updated successfully",
+      opportunity,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
   }
-);
+});
 
 
-// 🔹 DELETE OPPORTUNITY (NGO only)
 router.delete(
   "/:id",
   authMiddleware,
   authorizeRole("ngo"),
   async (req, res) => {
     try {
-      const opportunity = await Opportunity.findById(req.params.id);
+      const { id } = req.params;
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid opportunity ID",
+        });
+      }
+
+      const opportunity = await Opportunity.findOne({
+        _id: id,
+        ngo_id: req.user._id,
+      });
 
       if (!opportunity) {
         return res.status(404).json({
           success: false,
-          message: "Opportunity not found",
-        });
-      }
-
-      if (opportunity.ngo_id.toString() !== req.user._id.toString()) {
-        return res.status(403).json({
-          success: false,
-          message: "Not allowed to delete this opportunity",
+          message: "Opportunity not found or not authorized",
         });
       }
 
@@ -117,10 +141,9 @@ router.delete(
       res.status(500).json({
         success: false,
         message: "Internal Server Error",
-        error,
       });
     }
-  }
+  },
 );
 
 module.exports = router;

@@ -4,7 +4,7 @@ const opportunitySchema = new mongoose.Schema(
   {
     ngo_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users", // references your User model
+      ref: "users",
       required: true,
     },
 
@@ -39,8 +39,8 @@ const opportunitySchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // createdAt & updatedAt
-  }
+    timestamps: true,
+  },
 );
 
 module.exports = mongoose.model("Opportunity", opportunitySchema);
