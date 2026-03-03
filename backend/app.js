@@ -2,6 +2,7 @@ const express = require("express");
 const { connectDB } = require("./config/db");
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
+const opportunityRoutes = require("./routes/opportunityRoutes");
 const jwtAuth = require("./middleware/jwtAuth");
 const cors=require("cors");
 const app = express();
@@ -10,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/user", jwtAuth, userRouter);
-
+app.use("/api/opportunities", opportunityRoutes);
 app.get("/", (req, res) => {
   res.send("API is running!");
 });
