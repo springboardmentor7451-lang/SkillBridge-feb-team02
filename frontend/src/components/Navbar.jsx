@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import useAuth from "../context/useAuth";
 
-const Navbar = ({ openAuthModal }) => {
+const Navbar = ({ openAuthModal, role }) => {
   const { isAuthenticated, logoutUser, user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -54,6 +54,11 @@ const Navbar = ({ openAuthModal }) => {
               >
                 Logout
               </button>
+              {role === "ngo" && <Link to="/ngo">NGO Dashboard</Link>}
+
+              {role === "volunteer" && (
+                <Link to="/volunteer">Volunteer Dashboard</Link>
+              )}
             </div>
           ) : (
             <>

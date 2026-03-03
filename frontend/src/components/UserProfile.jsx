@@ -1,12 +1,8 @@
-import React, { useEffect } from "react";
 import useAuth from "../context/useAuth";
 
 const UserProfile = () => {
   const { user, logoutUser } = useAuth();
 
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
 
   if (!user) {
     return (
