@@ -31,6 +31,7 @@ router.post("/", authMiddleware, authorizeRole("ngo"), async (req, res) => {
       opportunity: newOpportunity,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -96,13 +97,13 @@ router.put("/:id", authMiddleware, authorizeRole("ngo"), async (req, res) => {
       opportunity,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
     });
   }
 });
-
 
 router.delete(
   "/:id",
@@ -138,6 +139,7 @@ router.delete(
         message: "Opportunity deleted successfully",
       });
     } catch (error) {
+      console.log(error);
       res.status(500).json({
         success: false,
         message: "Internal Server Error",
@@ -145,5 +147,23 @@ router.delete(
     }
   },
 );
+
+router.get("/my", authMiddleware, authorizeRole("ngo"), async (req, res) => {
+  try {
+    const opportunities = await Opportunity.find({
+      ngo_id: req.user._id,
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: opportunities,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
 
 module.exports = router;
