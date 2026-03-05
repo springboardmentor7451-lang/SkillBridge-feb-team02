@@ -49,6 +49,17 @@ const UserProfile = () => {
                   </span>
                 )}
 
+                {user.role === "ngo" && user.website && (
+                  <a
+                    href={user.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-1 text-sm rounded-full bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"
+                  >
+                    🌐 {user.website.replace(/^https?:\/\//, '')}
+                  </a>
+                )}
+
                 <span className="px-4 py-1 text-sm rounded-full bg-slate-100 text-slate-700">
                   🗓 Joined {joinedDate}
                 </span>
@@ -80,33 +91,35 @@ const UserProfile = () => {
           <div className="grid md:grid-cols-2 gap-10">
             <div>
               <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-3">
-                About
+                {user.role === "ngo" ? "Organization Description" : "About Me"}
               </h3>
               <p className="text-slate-700 leading-relaxed whitespace-pre-line">
                 {user.bio || "No bio added yet."}
               </p>
             </div>
 
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-3">
-                Skills
-              </h3>
+            {user.role === "volunteer" && (
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-3">
+                  Skills
+                </h3>
 
-              {user.skills && user.skills.length > 0 ? (
-                <div className="flex flex-wrap gap-3">
-                  {user.skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-slate-500 text-sm">No skills added yet.</p>
-              )}
-            </div>
+                {user.skills && user.skills.length > 0 ? (
+                  <div className="flex flex-wrap gap-3">
+                    {user.skills.map((skill, index) => (
+                      <span
+                        key={index}
+                        className="px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-slate-500 text-sm">No skills added yet.</p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -67,7 +67,7 @@ export default function NgoDashboard() {
             {userInitial}
           </div>
           <div className="flex-1 text-center md:text-left space-y-2">
-            <h1 className="text-3xl font-bold text-slate-900">{user.name}</h1>
+            <h1 className="text-3xl font-bold text-slate-900">{user.organization_name}</h1>
             <p className="text-slate-500">{user.email}</p>
             {user.location && (
               <span className="inline-block px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm mt-2">
@@ -75,7 +75,7 @@ export default function NgoDashboard() {
               </span>
             )}
             <p className="text-slate-700 mt-4 whitespace-pre-line">
-              {user.organizationDetails || user.bio || "No organization details provided."}
+              {user.organization_description || user.organizationDetails || user.bio || "No organization details provided."}
             </p>
           </div>
           <button

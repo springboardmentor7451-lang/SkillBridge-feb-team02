@@ -12,7 +12,9 @@ const ProfileEdit = () => {
     location: "",
     bio: "",
     skills: "",
+    organization_name: "",
     organizationDetails: "",
+    website: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,7 +29,9 @@ const ProfileEdit = () => {
         location: user.location || "",
         bio: user.bio || "",
         skills: user.skills ? user.skills.join(", ") : "",
-        organizationDetails: user.organizationDetails || "",
+        organization_name: user.organization_name || "",
+        organizationDetails: user.organization_description || user.organizationDetails || "",
+        website: user.website || "",
       });
     }
   }, [user]);
@@ -56,7 +60,7 @@ const ProfileEdit = () => {
         payload.organizationDetails = formData.organizationDetails;
       }
 
-      await api.put("/users/me", payload);
+      await api.put("/user/me", payload);
 
       setSuccessMessage("Profile updated successfully!");
 
