@@ -43,6 +43,12 @@ const Navbar = ({ openAuthModal, role }) => {
         <div className="hidden md:flex gap-5 items-center">
           {isAuthenticated ? (
             <div className="flex items-center gap-4">
+
+              {role === "ngo" && <Link to="/ngo">NGO Dashboard</Link>}
+              {role === "volunteer" && (
+                <Link to="/volunteer">Volunteer Dashboard</Link>
+              )}
+
               <Link to="/profile">
                 <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white font-bold text-lg border-2 cursor-pointer">
                   {userInitial}
@@ -55,11 +61,6 @@ const Navbar = ({ openAuthModal, role }) => {
               >
                 Logout
               </button>
-
-              {role === "ngo" && <Link to="/ngo">NGO Dashboard</Link>}
-              {role === "volunteer" && (
-                <Link to="/volunteer">Volunteer Dashboard</Link>
-              )}
             </div>
           ) : (
             <>
@@ -90,9 +91,8 @@ const Navbar = ({ openAuthModal, role }) => {
       </nav>
 
       <div
-        className={`fixed inset-0 bg-white/95 backdrop-blur-sm z-40 transition-transform duration-300 ease-in-out md:hidden ${
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed inset-0 bg-white/95 backdrop-blur-sm z-40 transition-transform duration-300 ease-in-out md:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="pt-20 relative">
           <button
@@ -116,6 +116,17 @@ const Navbar = ({ openAuthModal, role }) => {
                   My Profile
                 </span>
               </Link>
+
+              {role === "ngo" && (
+                <Link to="/ngo" onClick={closeMenu} className="text-lg font-medium text-slate-700 no-underline">
+                  NGO Dashboard
+                </Link>
+              )}
+              {role === "volunteer" && (
+                <Link to="/volunteer" onClick={closeMenu} className="text-lg font-medium text-slate-700 no-underline">
+                  Volunteer Dashboard
+                </Link>
+              )}
 
               <button
                 onClick={handleLogout}

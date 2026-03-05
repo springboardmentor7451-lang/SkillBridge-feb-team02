@@ -8,6 +8,9 @@ import UserProfile from "./components/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NgoDashboard from "./pages/NgoDashboard";
 import VolunteerDashboard from "./pages/VolunteerDashboard";
+import CreateOpportunity from "./pages/CreateOpportunity";
+import EditOpportunity from "./pages/EditOpportunity";
+import ProfileEdit from "./components/ProfileEdit";
 import useAuth from "./context/useAuth";
 
 const AppContent = () => {
@@ -17,9 +20,12 @@ const AppContent = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user?.role) {
-      setRole(user.role);
+    const setUserRole = () => {
+      if (user?.role) {
+        setRole(user.role);
+      }
     }
+    setUserRole();
   }, [user]);
 
   const openAuthModal = (mode = "login") => {
@@ -48,10 +54,37 @@ const AppContent = () => {
         />
 
         <Route
+          path="/profile/edit"
+          element={
+            <ProtectedRoute>
+              <ProfileEdit />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/ngo"
           element={
             <ProtectedRoute>
               <NgoDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/opportunities/create"
+          element={
+            <ProtectedRoute>
+              <CreateOpportunity />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/opportunities/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditOpportunity />
             </ProtectedRoute>
           }
         />
