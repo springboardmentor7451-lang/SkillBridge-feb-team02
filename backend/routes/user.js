@@ -12,23 +12,38 @@ router.get("/me", (req, res) => {
 
 router.put("/me", async (req, res) => {
   try {
-    const { email, role } = req.user;
-
+    const { _id, role } = req.user;
     const updateFields = {};
+    const { name, location, bio } = req.body;
+    if (name !== undefined) updateFields.name = name;
+    if (location !== undefined) updateFields.location = location;
+    if (bio !== undefined) updateFields.bio = bio;
 
     if (role === "volunteer") {
-      const { name, location, bio, skills } = req.body;
-
-      if (name) updateFields.name = name;
-      if (location) updateFields.location = location;
-      if (bio) updateFields.bio = bio;
-      if (skills) updateFields.skills = skills;
+      const { skills } = req.body;
+      if (skills !== undefined) {
+        if (!Array.isArray(skills)) {
+          return res.status(400).json({ success: false, message: "Skills must be an array" });
+        }
+        updateFields.skills = skills;
+      }
     } else if (role === "ngo") {
-      const { organization_name, description, website } = req.body;
+      const { organization_name, description, organizationDetails, website } = req.body;
 
-      if (organization_name) updateFields.organization_name = organization_name;
-      if (description) updateFields.description = description;
-      if (website) updateFields.website = website;
+      if (organization_name !== undefined) updateFields.organization_name = organization_name;
+
+      if (description !== undefined) {
+        updateFields.organization_description = description;
+      } else if (organizationDetails !== undefined) {
+        updateFields.organization_description = organizationDetails;
+      }
+
+      if (website !== undefined) {
+        if (website !== "" && !website.startsWith("http")) {
+          return res.status(400).json({ success: false, message: "Invalid website URL" });
+        }
+        updateFields.website = website;
+      }
     } else {
       return res.status(400).json({
         success: false,
@@ -36,11 +51,11 @@ router.put("/me", async (req, res) => {
       });
     }
 
-    const updatedUser = await UserModel.findOneAndUpdate(
-      { email },
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      _id,
       { $set: updateFields },
-      { new: true, runValidators: true },
-    );
+      { new: true }
+    ).select("-password");
 
     if (!updatedUser) {
       return res.status(404).json({
