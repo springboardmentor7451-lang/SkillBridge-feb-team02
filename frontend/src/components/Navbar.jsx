@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import useAuth from "../context/useAuth";
@@ -43,22 +43,24 @@ const Navbar = ({ openAuthModal, role }) => {
         <div className="hidden md:flex gap-5 items-center">
           {isAuthenticated ? (
             <div className="flex items-center gap-4">
+
+              {role === "ngo" && <Link to="/ngo">NGO Dashboard</Link>}
+              {role === "volunteer" && (
+                <Link to="/volunteer">Volunteer Dashboard</Link>
+              )}
+
               <Link to="/profile">
                 <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white font-bold text-lg border-2 cursor-pointer">
                   {userInitial}
                 </div>
               </Link>
+
               <button
                 onClick={handleLogout}
                 className="text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors bg-transparent border-none cursor-pointer"
               >
                 Logout
               </button>
-              {role === "ngo" && <Link to="/ngo">NGO Dashboard</Link>}
-
-              {role === "volunteer" && (
-                <Link to="/volunteer">Volunteer Dashboard</Link>
-              )}
             </div>
           ) : (
             <>
@@ -68,6 +70,7 @@ const Navbar = ({ openAuthModal, role }) => {
               >
                 Log In
               </button>
+
               <button
                 className="px-6 py-2.5 rounded-full font-medium transition-all bg-slate-900 text-white hover:bg-slate-800 hover:-translate-y-0.5 border-none cursor-pointer"
                 onClick={() => openAuthModal("signup")}
@@ -88,9 +91,8 @@ const Navbar = ({ openAuthModal, role }) => {
       </nav>
 
       <div
-        className={`fixed inset-0 bg-white/95 backdrop-blur-sm z-40 transition-transform duration-300 ease-in-out md:hidden ${
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed inset-0 bg-white/95 backdrop-blur-sm z-40 transition-transform duration-300 ease-in-out md:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="pt-20 relative">
           <button
@@ -114,6 +116,17 @@ const Navbar = ({ openAuthModal, role }) => {
                   My Profile
                 </span>
               </Link>
+
+              {role === "ngo" && (
+                <Link to="/ngo" onClick={closeMenu} className="text-lg font-medium text-slate-700 no-underline">
+                  NGO Dashboard
+                </Link>
+              )}
+              {role === "volunteer" && (
+                <Link to="/volunteer" onClick={closeMenu} className="text-lg font-medium text-slate-700 no-underline">
+                  Volunteer Dashboard
+                </Link>
+              )}
 
               <button
                 onClick={handleLogout}
