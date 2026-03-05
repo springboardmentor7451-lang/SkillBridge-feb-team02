@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 import AuthProvider from "./context/AuthProvider";
 import AuthModal from "./components/Auth/AuthModal";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import UserProfile from "./components/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { Routes, Route, Link } from "react-router-dom";
 import NgoDashboard from "./pages/NgoDashboard";
 import VolunteerDashboard from "./pages/VolunteerDashboard";
-import { useEffect } from "react";
+import CreateOpportunity from "./pages/CreateOpportunity";
+import EditOpportunity from "./pages/EditOpportunity";
+import ProfileEdit from "./components/ProfileEdit";
 import useAuth from "./context/useAuth";
 
 const AppContent = () => {
@@ -19,12 +21,12 @@ const AppContent = () => {
 
   useEffect(() => {
     const setUserRole = () => {
-      setRole(user.role);
-    };
-    if (user?.role) {
-      setUserRole();
+      if (user?.role) {
+        setRole(user.role);
+      }
     }
-  }, [user, role]);
+    setUserRole();
+  }, [user]);
 
   const openAuthModal = (mode = "login") => {
     setAuthModalMode(mode);
@@ -50,11 +52,39 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/profile/edit"
+          element={
+            <ProtectedRoute>
+              <ProfileEdit />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/ngo"
           element={
             <ProtectedRoute>
               <NgoDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/opportunities/create"
+          element={
+            <ProtectedRoute>
+              <CreateOpportunity />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/opportunities/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditOpportunity />
             </ProtectedRoute>
           }
         />
