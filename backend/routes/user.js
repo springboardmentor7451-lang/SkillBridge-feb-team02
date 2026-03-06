@@ -28,14 +28,12 @@ router.put("/me", async (req, res) => {
         updateFields.skills = skills;
       }
     } else if (role === "ngo") {
-      const { organization_name, description, organizationDetails, website } = req.body;
+      const { organization_name, description, website } = req.body;
 
       if (organization_name !== undefined) updateFields.organization_name = organization_name;
 
       if (description !== undefined) {
         updateFields.organization_description = description;
-      } else if (organizationDetails !== undefined) {
-        updateFields.organization_description = organizationDetails;
       }
 
       if (website !== undefined) {

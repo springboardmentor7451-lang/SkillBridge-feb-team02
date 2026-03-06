@@ -49,7 +49,6 @@ const ProfileEdit = () => {
     try {
       const payload = {
         name: formData.name,
-        email: formData.email,
         location: formData.location,
         bio: formData.bio,
       };
@@ -57,7 +56,9 @@ const ProfileEdit = () => {
       if (user?.role === "volunteer") {
         payload.skills = formData.skills.split(",").map(s => s.trim()).filter(Boolean);
       } else if (user?.role === "ngo") {
-        payload.organizationDetails = formData.organizationDetails;
+        payload.organization_name = formData.organization_name;
+        payload.description = formData.organizationDetails;
+        payload.website = formData.website;
       }
 
       await api.put("/user/me", payload);
@@ -118,13 +119,13 @@ const ProfileEdit = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                <label className="block text-sm font-medium text-slate-400 mb-2">Email (Read-only)</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  readOnly
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed outline-none"
                 />
               </div>
             </div>
@@ -168,16 +169,39 @@ const ProfileEdit = () => {
             )}
 
             {user?.role === "ngo" && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Organization Details</label>
-                <textarea
-                  name="organizationDetails"
-                  value={formData.organizationDetails}
-                  onChange={handleChange}
-                  rows="4"
-                  className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900"
-                  placeholder="Describe your organization's mission and goals..."
-                ></textarea>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Organization Name</label>
+                  <input
+                    type="text"
+                    name="organization_name"
+                    value={formData.organization_name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Organization Details (Description)</label>
+                  <textarea
+                    name="organizationDetails"
+                    value={formData.organizationDetails}
+                    onChange={handleChange}
+                    rows="4"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    placeholder="Describe your organization's mission and goals..."
+                  ></textarea>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Website</label>
+                  <input
+                    type="url"
+                    name="website"
+                    value={formData.website}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    placeholder="https://example.org"
+                  />
+                </div>
               </div>
             )}
 

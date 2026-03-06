@@ -33,9 +33,12 @@ const UserProfile = () => {
             <div className="flex-1 text-center md:text-left space-y-3">
               <div>
                 <h1 className="text-3xl font-bold text-slate-900">
-                  {user.name}
+                  {user.role === "ngo" ? (user.organization_name || user.name) : user.name}
                 </h1>
                 <p className="text-slate-500">@{user.username}</p>
+                {user.role === "ngo" && user.organization_name && user.organization_name !== user.name && (
+                  <p className="text-slate-400 text-sm italic">Rep: {user.name}</p>
+                )}
               </div>
 
               <div className="flex flex-wrap gap-3 justify-center md:justify-start">
@@ -94,7 +97,10 @@ const UserProfile = () => {
                 {user.role === "ngo" ? "Organization Description" : "About Me"}
               </h3>
               <p className="text-slate-700 leading-relaxed whitespace-pre-line">
-                {user.bio || "No bio added yet."}
+                {user.role === "ngo"
+                  ? (user.organization_description || user.organizationDetails || user.bio || "No description provided.")
+                  : (user.bio || "No bio added yet.")
+                }
               </p>
             </div>
 
