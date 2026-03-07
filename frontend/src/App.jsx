@@ -1,35 +1,119 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
+import AuthProvider from "./context/AuthProvider";
+import AuthModal from "./components/Auth/AuthModal";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import UserProfile from "./components/UserProfile";
+import ProtectedRoute from "./components/ProtectedRoute";
+import NgoDashboard from "./pages/NgoDashboard";
+import VolunteerDashboard from "./pages/VolunteerDashboard";
+import CreateOpportunity from "./pages/CreateOpportunity";
+import EditOpportunity from "./pages/EditOpportunity";
+import ProfileEdit from "./components/ProfileEdit";
+import useAuth from "./context/useAuth";
 
-function App() {
-  const [count, setCount] = useState(0)
+const AppContent = () => {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState("login");
+  const [role, setRole] = useState(null);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const setUserRole = () => {
+      if (user?.role) {
+        setRole(user.role);
+      }
+    }
+    setUserRole();
+  }, [user]);
+
+  const openAuthModal = (mode = "login") => {
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setIsAuthModalOpen(false);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <main className="bg-zinc-100 min-h-screen overflow-hidden">
+      <Navbar openAuthModal={openAuthModal} role={role} />
+
+      <Routes>
+        <Route path="/" element={<Hero openAuthModal={openAuthModal} />} />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile/edit"
+          element={
+            <ProtectedRoute>
+              <ProfileEdit />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/ngo"
+          element={
+            <ProtectedRoute>
+              <NgoDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/opportunities/create"
+          element={
+            <ProtectedRoute>
+              <CreateOpportunity />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/opportunities/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditOpportunity />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/volunteer"
+          element={
+            <ProtectedRoute>
+              <VolunteerDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        initialMode={authModalMode}
+      />
+    </main>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
