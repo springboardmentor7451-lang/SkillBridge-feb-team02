@@ -43,6 +43,6 @@ const opportunitySchema = new mongoose.Schema(
   },
 );
 
-const OpportunityModel = mongoose.model("Opportunity", opportunitySchema);
+const OpportunityModel = mongoose.model("opportunity", opportunitySchema);
 
 module.exports = OpportunityModel;
