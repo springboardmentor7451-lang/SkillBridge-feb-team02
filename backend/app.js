@@ -4,6 +4,7 @@ const { connectDB } = require("./config/db");
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 const opportunityRoutes = require("./routes/opportunity");
+const applicationRoutes = require("./routes/application");
 const jwtAuth = require("./middleware/jwtAuth");
 const cors = require("cors");
 const app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/user", jwtAuth, userRouter);
 app.use("/api/opportunities", opportunityRoutes);
+app.use("/api/applications", applicationRoutes);
 app.get("/", (req, res) => {
   res.send("API is running!");
 });
