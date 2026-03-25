@@ -13,6 +13,7 @@ import CreateOpportunity from "./pages/CreateOpportunity";
 import EditOpportunity from "./pages/EditOpportunity";
 import ProfileEdit from "./components/ProfileEdit";
 import useAuth from "./context/useAuth";
+import OpportunityDetails from "./components/OpportunityDetails";
 
 const AppContent = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -100,6 +101,8 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+
+        <Route path="/opportunities/:id" element={<OpportunityDetails />} />
       </Routes>
 
       <AuthModal
