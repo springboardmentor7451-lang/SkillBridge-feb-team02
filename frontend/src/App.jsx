@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import UserProfile from "./components/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
+import OpportunityListing from './components/OpportunityListing';
 import NgoDashboard from "./pages/NgoDashboard";
 import VolunteerDashboard from "./pages/VolunteerDashboard";
 import CreateOpportunity from "./pages/CreateOpportunity";
@@ -43,6 +44,8 @@ const AppContent = () => {
 
       <Routes>
         <Route path="/" element={<Hero openAuthModal={openAuthModal} />} />
+
+        <Route path="/opportunities" element={<OpportunityListing />} />
 
         <Route
           path="/profile"
