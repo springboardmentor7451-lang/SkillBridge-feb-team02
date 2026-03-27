@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../context/useAuth";
-import { opportunityService } from "../services/opportunityService";
+import opportunityService from "../services/opportunityService";
+import ApplicationManagement from "../components/ApplicationManagement";
 
 export default function NgoDashboard() {
   const { user } = useAuth();
@@ -10,6 +11,8 @@ export default function NgoDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [opportunityToDelete, setOpportunityToDelete] = useState(null);
+  const [selectedOpportunity, setSelectedOpportunity] = useState(null);
+  const [showApplicationsModal, setShowApplicationsModal] = useState(false);
 
   useEffect(() => {
     fetchOpportunities();
@@ -20,7 +23,6 @@ export default function NgoDashboard() {
     try {
       setIsLoading(true);
       const data = await opportunityService.getAll({ ngoId: user.id });
-      // API might return an array directly or an object with a data property
       setOpportunities(Array.isArray(data) ? data : (data.data || []));
     } catch (error) {
       console.error("Failed to fetch opportunities", error);
@@ -60,8 +62,6 @@ export default function NgoDashboard() {
   return (
     <div className="min-h-screen bg-zinc-100 pt-32 px-4 pb-12">
       <div className="max-w-5xl mx-auto space-y-8">
-
-        {/* Organization Info Card */}
         <div className="bg-white rounded-2xl shadow-sm p-6 md:p-10 flex flex-col md:flex-row items-center md:items-start gap-8">
           <div className="w-24 h-24 rounded-full bg-slate-900 flex items-center justify-center text-white text-4xl font-bold shrink-0">
             {userInitial}
@@ -86,7 +86,6 @@ export default function NgoDashboard() {
           </button>
         </div>
 
-        {/* Posted Opportunities */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
           <div className="p-6 border-b border-slate-200">
             <h2 className="text-xl font-bold text-slate-900">Posted Opportunities</h2>
@@ -125,6 +124,15 @@ export default function NgoDashboard() {
                   </div>
                   <div className="flex gap-2 w-full md:w-auto justify-end">
                     <button
+                      onClick={() => {
+                        setSelectedOpportunity(opp);
+                        setShowApplicationsModal(true);
+                      }}
+                      className="px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
+                    >
+                      View Applications
+                    </button>
+                    <button
                       onClick={() => navigate(`/opportunities/edit/${opp._id || opp.id}`, { state: { opportunity: opp } })}
                       className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
                     >
@@ -145,7 +153,6 @@ export default function NgoDashboard() {
 
       </div>
 
-      {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform transition-all">
@@ -174,6 +181,15 @@ export default function NgoDashboard() {
             </div>
           </div>
         </div>
+      )}
+      {showApplicationsModal && selectedOpportunity && (
+        <ApplicationManagement
+          opportunity={selectedOpportunity}
+          onClose={() => {
+            setShowApplicationsModal(false);
+            setSelectedOpportunity(null);
+          }}
+        />
       )}
     </div>
   );

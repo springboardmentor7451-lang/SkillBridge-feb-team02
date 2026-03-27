@@ -6,11 +6,13 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import UserProfile from "./components/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
+import OpportunityListing from './components/OpportunityListing';
 import NgoDashboard from "./pages/NgoDashboard";
 import VolunteerDashboard from "./pages/VolunteerDashboard";
 import CreateOpportunity from "./pages/CreateOpportunity";
 import EditOpportunity from "./pages/EditOpportunity";
 import ProfileEdit from "./components/ProfileEdit";
+import MyApplications from "./pages/MyApplications";
 import useAuth from "./context/useAuth";
 
 const AppContent = () => {
@@ -43,6 +45,8 @@ const AppContent = () => {
 
       <Routes>
         <Route path="/" element={<Hero openAuthModal={openAuthModal} />} />
+
+        <Route path="/opportunities" element={<OpportunityListing />} />
 
         <Route
           path="/profile"
@@ -94,6 +98,14 @@ const AppContent = () => {
           element={
             <ProtectedRoute>
               <VolunteerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-applications"
+          element={
+            <ProtectedRoute>
+              <MyApplications />
             </ProtectedRoute>
           }
         />

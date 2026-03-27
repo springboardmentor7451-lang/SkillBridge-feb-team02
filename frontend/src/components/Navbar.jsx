@@ -46,7 +46,10 @@ const Navbar = ({ openAuthModal, role }) => {
 
               {role === "ngo" && <Link to="/ngo">NGO Dashboard</Link>}
               {role === "volunteer" && (
-                <Link to="/volunteer">Volunteer Dashboard</Link>
+                <>
+                  <Link to="/volunteer">Dashboard</Link>
+                  <Link to="/my-applications">My Applications</Link>
+                </>
               )}
 
               <Link to="/profile">
@@ -123,9 +126,14 @@ const Navbar = ({ openAuthModal, role }) => {
                 </Link>
               )}
               {role === "volunteer" && (
-                <Link to="/volunteer" onClick={closeMenu} className="text-lg font-medium text-slate-700 no-underline">
-                  Volunteer Dashboard
-                </Link>
+                <>
+                  <Link to="/volunteer" onClick={closeMenu} className="text-lg font-medium text-slate-700 no-underline">
+                    Dashboard
+                  </Link>
+                  <Link to="/my-applications" onClick={closeMenu} className="text-lg font-medium text-slate-700 no-underline">
+                    My Applications
+                  </Link>
+                </>
               )}
 
               <button
