@@ -157,7 +157,7 @@ router.get("/my", authMiddleware, authorizeRole("ngo"), async (req, res) => {
 
     res.json({
       success: true,
-      data: opportunities,
+     opportunities,
     });
   } catch (error) {
     res.status(500).json({
@@ -166,5 +166,83 @@ router.get("/my", authMiddleware, authorizeRole("ngo"), async (req, res) => {
     });
   }
 });
+// 🔹 PUBLIC: Browse & Filter Opportunities
+router.get("/", async (req, res) => {
+  try {
+    const { skill, location, title } = req.query;
+
+    let filter = {
+      status: "open",
+    };
+
+    if (skill) {
+      filter.required_skills = { $elemMatch:{ $regex: skill, $options: "i" },};
+    }
+
+    if (location) {
+      filter.location = { $regex: location, $options: "i" };
+    }
+
+    if (title) {
+      filter.title = { $regex: title, $options: "i" };
+    }
+
+    const opportunities = await Opportunity.find(filter)
+      .populate("ngo_id", "organization_name")
+      .select("title description required_skills duration location ngo_id")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      opportunities,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
+
+// 🔹 PUBLIC: Get Single Opportunity
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid opportunity ID",
+      });
+    }
+
+    const opportunity = await Opportunity.findById(id).populate(
+      "ngo_id",
+      "organization_name",
+    ).select("title description required_skills duration location status ngo_id")
+    ;
+
+    if (!opportunity) {
+      return res.status(404).json({
+        success: false,
+        message: "Opportunity not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      opportunity,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
 
 module.exports = router;
