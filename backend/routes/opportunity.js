@@ -8,7 +8,7 @@ const authorizeRole = require("../middleware/authorizeRole");
 router.get("/", async (req, res) => {
   try {
     const { skill, location, search, limit } = req.query;
-    const query = { status: 'active' };
+    const query = { status: 'open' };
     if (skill) {
       query.required_skills = { 
         $in: [new RegExp(skill, 'i')] 
@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
       ];
     }
     let opportunitiesQuery = Opportunity.find(query)
-      .populate('ngo_id', 'name email organizationName logo') 
+      .populate('ngo_id', 'name email organization_name logo') 
       .sort({ createdAt: -1 });
     if (limit) {
       opportunitiesQuery = opportunitiesQuery.limit(parseInt(limit));
@@ -50,7 +50,7 @@ router.get("/", async (req, res) => {
 router.get("/filters/options", async (req, res) => {
   try {
 
-    const opportunities = await Opportunity.find({ status: 'active' });
+    const opportunities = await Opportunity.find({ status: 'open' });
 
     const skillsSet = new Set();
     opportunities.forEach(opp => {
@@ -98,7 +98,7 @@ router.get("/:id", async (req, res) => {
     }
 
     const opportunity = await Opportunity.findById(id)
-      .populate('ngo_id', 'name email organizationName logo description location');
+      .populate('ngo_id', 'name email organization_name logo description location');
 
     if (!opportunity) {
       return res.status(404).json({
@@ -140,7 +140,7 @@ router.post("/", authMiddleware, authorizeRole("ngo"), async (req, res) => {
       required_skills,
       duration: duration.trim(),
       location: location.trim(),
-      status: 'active', 
+      status: 'open', 
     });
 
     res.status(201).json({

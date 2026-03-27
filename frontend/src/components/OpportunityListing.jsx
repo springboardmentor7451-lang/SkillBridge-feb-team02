@@ -214,8 +214,8 @@ function OpportunityCard({ opportunity, userRole, onApply }) {
 
   const skills = opportunity.required_skills || opportunity.skillsRequired || opportunity.skills || [];
 
-  const ngoName = opportunity.ngo_id?.name ||
-    opportunity.ngo_id?.organizationName ||
+  const ngoName = opportunity.ngo_id?.organization_name ||
+    opportunity.ngo_id?.name ||
     opportunity.ngoName ||
     'Organization';
 
