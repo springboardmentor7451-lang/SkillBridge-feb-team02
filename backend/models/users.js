@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema(
     role: { type: String, enum: ["volunteer", "ngo"], required: true },
     skills: { type: [String], default: undefined },
     location: { type: String },
+
     bio: {
       type: String,
       required: function () {
@@ -34,13 +35,11 @@ const userSchema = new mongoose.Schema(
         return this.role === "ngo";
       },
     },
+
     website: { type: String },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true }
 );
 
 const UserModel = mongoose.model("User", userSchema);
-
 module.exports = UserModel;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAuth from "../context/useAuth";
-import { opportunityService } from "../services/opportunityService";
+import  opportunityService  from "../services/opportunityService";
 
 const EditOpportunity = () => {
     const { user } = useAuth();

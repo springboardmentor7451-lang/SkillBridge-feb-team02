@@ -8,7 +8,7 @@ const authMiddleware = async (req, res, next) => {
     if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.split(" ")[1];
       const decode = jwt.verify(token, JWT_SECRET);
-      req.user = await UserModel.findOne({ email:decode.email }).select("-password");
+      req.user = await UserModel.findOne({ email: decode.email }).select("-password");
       if (!req.user) {
         return res.status(401).json({
           success: false,
@@ -16,6 +16,12 @@ const authMiddleware = async (req, res, next) => {
         });
       }
       next();
+    }
+    else {
+      return res.status(401).json({
+        success: false,
+        message: "No token provided",
+      });
     }
   } catch (error) {
     return res.status(403).json({
