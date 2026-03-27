@@ -2,13 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 const Opportunity = require("../models/opportunity");
+const Application = require("../models/application");
 const authMiddleware = require("../middleware/jwtAuth");
 const authorizeRole = require("../middleware/authorizeRole");
 
 router.get("/", async (req, res) => {
   try {
     const { skill, location, search, limit } = req.query;
-    const query = { status: 'active' };
+    const query = { status: 'open' };
     if (skill) {
       query.required_skills = { 
         $in: [new RegExp(skill, 'i')] 
@@ -24,7 +25,7 @@ router.get("/", async (req, res) => {
       ];
     }
     let opportunitiesQuery = Opportunity.find(query)
-      .populate('ngo_id', 'name email organizationName logo') 
+      .populate('ngo_id', 'name email organization_name') 
       .sort({ createdAt: -1 });
     if (limit) {
       opportunitiesQuery = opportunitiesQuery.limit(parseInt(limit));
@@ -50,7 +51,7 @@ router.get("/", async (req, res) => {
 router.get("/filters/options", async (req, res) => {
   try {
 
-    const opportunities = await Opportunity.find({ status: 'active' });
+    const opportunities = await Opportunity.find({ status: 'open' });
 
     const skillsSet = new Set();
     opportunities.forEach(opp => {
@@ -86,6 +87,35 @@ router.get("/filters/options", async (req, res) => {
   }
 });
 
+router.get("/my", authMiddleware, authorizeRole("ngo"), async (req, res) => {
+  try {
+    const opportunities = await Opportunity.find({
+      ngo_id: req.user._id,
+    }).sort({ createdAt: -1 }).lean();
+
+    // Add applicants count for each opportunity
+    const opportunitiesWithCount = await Promise.all(
+      opportunities.map(async (opp) => {
+        const applicantsCount = await Application.countDocuments({
+          opportunity_id: opp._id,
+        });
+        return { ...opp, applicantsCount };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: opportunitiesWithCount,
+    });
+  } catch (error) {
+    console.error("Error fetching my opportunities:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -98,7 +128,7 @@ router.get("/:id", async (req, res) => {
     }
 
     const opportunity = await Opportunity.findById(id)
-      .populate('ngo_id', 'name email organizationName logo description location');
+      .populate('ngo_id', 'name email organization_name organization_description location');
 
     if (!opportunity) {
       return res.status(404).json({
@@ -140,7 +170,7 @@ router.post("/", authMiddleware, authorizeRole("ngo"), async (req, res) => {
       required_skills,
       duration: duration.trim(),
       location: location.trim(),
-      status: 'active', 
+      status: 'open', 
     });
 
     res.status(201).json({
@@ -270,14 +300,16 @@ router.get("/my", authorizeRole("ngo"), async (req, res) => {
 
     res.json({
       success: true,
-      data: opportunities,
+      message: "Opportunity deleted successfully",
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
     });
   }
-});
+},
+);
 
 module.exports = router;

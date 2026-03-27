@@ -12,6 +12,7 @@ import VolunteerDashboard from "./pages/VolunteerDashboard";
 import CreateOpportunity from "./pages/CreateOpportunity";
 import EditOpportunity from "./pages/EditOpportunity";
 import ProfileEdit from "./components/ProfileEdit";
+import MyApplications from "./pages/MyApplications";
 import useAuth from "./context/useAuth";
 import OpportunityDetails from "./components/OpportunityDetails";
 
@@ -101,8 +102,14 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
-
-        <Route path="/opportunities/:id" element={<OpportunityDetails />} />
+        <Route
+          path="/my-applications"
+          element={
+            <ProtectedRoute>
+              <MyApplications />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
       <AuthModal
