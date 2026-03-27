@@ -12,8 +12,8 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/user", jwtAuth, userRouter);
-app.use("/api/opportunities", opportunityRoutes);
-app.use("/api/applications", applicationRoutes);
+app.use("/api/opportunities", jwtAuth, opportunityRoutes);
+app.use("/api/applications", jwtAuth, applicationRoutes);
 app.get("/", (req, res) => {
   res.send("API is running!");
 });

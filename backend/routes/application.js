@@ -5,21 +5,11 @@ const Application = require("../models/application");
 const Opportunity = require("../models/opportunity");
 
 const authorizeRole = require("../middleware/authorizeRole");
-const jwtAuth = require("../middleware/jwtAuth");
 
-// Apply to opportunity (Volunteer only)
-router.post("/",jwtAuth, authorizeRole("volunteer"), async (req, res) => {
+router.post("/", authorizeRole("volunteer"), async (req, res) => {
   try {
-    // check role
-    if (req.user.role !== "volunteer") {
-      return res.status(403).json({
-        success: false,
-        message: "Only volunteers can apply",
-      });
-    }
-
     const { opportunity_id } = req.body;
-     if (!opportunity_id) {
+    if (!opportunity_id) {
       return res.status(400).json({
         success: false,
         message: "opportunity_id is required",
@@ -69,10 +59,11 @@ router.post("/",jwtAuth, authorizeRole("volunteer"), async (req, res) => {
       application,
     });
   } catch (error) {
+    console.error("Apply to Opportunity Error:", error);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
-      error,
+      error: error.message,
     });
   }
 });

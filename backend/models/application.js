@@ -4,12 +4,12 @@ const applicationSchema = new mongoose.Schema(
   {
     opportunity_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "opportunity",
+      ref: "Opportunity",
       required: true,
     },
     volunteer_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "User",
       required: true,
     },
     status: {
@@ -20,9 +20,7 @@ const applicationSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-applicationSchema.index(
-  { opportunity_id: 1, volunteer_id: 1 },
-  { unique: true }
-);
 
-module.exports = mongoose.model("application", applicationSchema);
+const ApplicationModel = mongoose.model("Application", applicationSchema);
+
+module.exports = ApplicationModel;
