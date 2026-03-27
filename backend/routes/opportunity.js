@@ -188,7 +188,7 @@ router.post("/", authMiddleware, authorizeRole("ngo"), async (req, res) => {
   }
 });
 
-router.put("/:id", authMiddleware, authorizeRole("ngo"), async (req, res) => {
+router.put("/:id", authorizeRole("ngo"), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -253,47 +253,43 @@ router.put("/:id", authMiddleware, authorizeRole("ngo"), async (req, res) => {
   }
 });
 
-router.delete(
-  "/:id",
-  authMiddleware,
-  authorizeRole("ngo"),
-  async (req, res) => {
-    try {
-      const { id } = req.params;
+router.delete("/:id", authorizeRole("ngo"), async (req, res) => {
+  try {
+    const { id } = req.params;
 
-      if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid opportunity ID",
-        });
-      }
-
-      const opportunity = await Opportunity.findOne({
-        _id: id,
-        ngo_id: req.user._id,
-      });
-
-      if (!opportunity) {
-        return res.status(404).json({
-          success: false,
-          message: "Opportunity not found or not authorized",
-        });
-      }
-
-      await opportunity.deleteOne();
-
-      res.json({
-        success: true,
-        message: "Opportunity deleted successfully",
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
         success: false,
-        message: "Internal Server Error",
+        message: "Invalid opportunity ID",
       });
     }
-  },
+
+    const opportunity = await Opportunity.findOne({
+      _id: id,
+      ngo_id: req.user._id,
+    });
+
+    if (!opportunity) {
+      return res.status(404).json({
+        success: false,
+        message: "Opportunity not found or not authorized",
+      });
+    }
+
+    await opportunity.deleteOne();
+
+    res.json({
+      success: true,
+      message: "Opportunity deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+},
 );
 
 module.exports = router;
