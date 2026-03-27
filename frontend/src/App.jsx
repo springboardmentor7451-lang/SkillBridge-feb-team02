@@ -12,6 +12,7 @@ import VolunteerDashboard from "./pages/VolunteerDashboard";
 import CreateOpportunity from "./pages/CreateOpportunity";
 import EditOpportunity from "./pages/EditOpportunity";
 import ProfileEdit from "./components/ProfileEdit";
+import MyApplications from "./pages/MyApplications";
 import useAuth from "./context/useAuth";
 
 const AppContent = () => {
@@ -97,6 +98,14 @@ const AppContent = () => {
           element={
             <ProtectedRoute>
               <VolunteerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-applications"
+          element={
+            <ProtectedRoute>
+              <MyApplications />
             </ProtectedRoute>
           }
         />

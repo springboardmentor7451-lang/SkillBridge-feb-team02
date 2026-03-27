@@ -13,7 +13,7 @@ const applicationService = {
 
   getMyApplications: async () => {
     try {
-      const response = await api.get("/applications/ngo/applications");
+      const response = await api.get("/applications/my");
       return response.data;
     } catch (error) {
       console.error("Error fetching my applications:", error);

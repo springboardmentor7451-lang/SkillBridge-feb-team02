@@ -224,6 +224,33 @@ router.post(
 );
 
 router.get(
+  "/my",
+  authMiddleware,
+  authorizeRole("volunteer"),
+  async (req, res) => {
+    try {
+      const applications = await Application.find({
+        volunteer_id: req.user._id,
+      })
+        .populate("opportunity_id", "title location required_skills status")
+        .populate("ngo_id", "name organization_name")
+        .sort({ applied_at: -1 });
+
+      res.json({
+        success: true,
+        data: applications,
+      });
+    } catch (error) {
+      console.error("Error fetching my applications:", error);
+      res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+      });
+    }
+  }
+);
+
+router.get(
   "/volunteer/applications",
   authMiddleware,
   authorizeRole("volunteer"),
