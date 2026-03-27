@@ -188,7 +188,36 @@ router.post("/", authMiddleware, authorizeRole("ngo"), async (req, res) => {
   }
 });
 
-router.put("/:id", authorizeRole("ngo"), async (req, res) => {
+router.get("/my", authorizeRole("ngo"), async (req, res) => {
+  try {
+    const opportunities = await Opportunity.find({
+      ngo_id: req.user._id,
+    }).sort({ createdAt: -1 }).lean();
+
+    // Add applicants count for each opportunity
+    const opportunitiesWithCount = await Promise.all(
+      opportunities.map(async (opp) => {
+        const applicantsCount = await Application.countDocuments({
+          opportunity_id: opp._id,
+        });
+        return { ...opp, applicantsCount };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: opportunitiesWithCount,
+    });
+  } catch (error) {
+    console.error("Error fetching my opportunities:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
+router.put("/:id", authMiddleware, authorizeRole("ngo"), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -289,7 +318,6 @@ router.delete("/:id", authorizeRole("ngo"), async (req, res) => {
       message: "Internal Server Error",
     });
   }
-},
-);
+});
 
 module.exports = router;

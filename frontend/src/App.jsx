@@ -14,6 +14,7 @@ import EditOpportunity from "./pages/EditOpportunity";
 import ProfileEdit from "./components/ProfileEdit";
 import MyApplications from "./pages/MyApplications";
 import useAuth from "./context/useAuth";
+import OpportunityDetails from "./pages/OpportunityDetails";
 
 const AppContent = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -47,6 +48,7 @@ const AppContent = () => {
         <Route path="/" element={<Hero openAuthModal={openAuthModal} />} />
 
         <Route path="/opportunities" element={<OpportunityListing />} />
+        <Route path="/opportunities/:id" element={<OpportunityDetails />} />
 
         <Route
           path="/profile"
