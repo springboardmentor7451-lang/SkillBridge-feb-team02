@@ -4,12 +4,19 @@ const router = express.Router();
 const Opportunity = require("../models/opportunity");
 const Application = require("../models/application");
 const authMiddleware = require("../middleware/jwtAuth");
+const optionalAuth = require("../middleware/optionalAuth");
 const authorizeRole = require("../middleware/authorizeRole");
 
-router.get("/", async (req, res) => {
+router.get("/", optionalAuth, async (req, res) => {
   try {
     const { skill, location, search, limit } = req.query;
     const query = { status: 'open' };
+
+    // If user is a volunteer, exclude opportunities they've applied to
+    if (req.user && req.user.role === 'volunteer') {
+      const appliedOpportunities = await Application.find({ volunteer_id: req.user._id }).distinct('opportunity_id');
+      query._id = { $nin: appliedOpportunities };
+    }
     if (skill) {
       query.required_skills = { 
         $in: [new RegExp(skill, 'i')] 
@@ -188,34 +195,6 @@ router.post("/", authMiddleware, authorizeRole("ngo"), async (req, res) => {
   }
 });
 
-router.get("/my", authorizeRole("ngo"), async (req, res) => {
-  try {
-    const opportunities = await Opportunity.find({
-      ngo_id: req.user._id,
-    }).sort({ createdAt: -1 }).lean();
-
-    // Add applicants count for each opportunity
-    const opportunitiesWithCount = await Promise.all(
-      opportunities.map(async (opp) => {
-        const applicantsCount = await Application.countDocuments({
-          opportunity_id: opp._id,
-        });
-        return { ...opp, applicantsCount };
-      })
-    );
-
-    res.json({
-      success: true,
-      data: opportunitiesWithCount,
-    });
-  } catch (error) {
-    console.error("Error fetching my opportunities:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
-  }
-});
 
 router.put("/:id", authMiddleware, authorizeRole("ngo"), async (req, res) => {
   try {
@@ -282,7 +261,7 @@ router.put("/:id", authMiddleware, authorizeRole("ngo"), async (req, res) => {
   }
 });
 
-router.delete("/:id", authorizeRole("ngo"), async (req, res) => {
+router.delete("/:id", authMiddleware, authorizeRole("ngo"), async (req, res) => {
   try {
     const { id } = req.params;
 

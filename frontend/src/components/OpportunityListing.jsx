@@ -88,7 +88,7 @@ export default function OpportunityListing() {
     }
 
     if (user.role === 'volunteer') {
-      navigate(`/opportunities/${opportunityId}/apply`);
+      navigate(`/opportunities/${opportunityId}`);
     } else {
       alert('Only volunteers can apply for opportunities');
     }

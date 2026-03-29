@@ -184,6 +184,13 @@ router.post(
         });
       }
 
+      if (opportunity.status !== "open") {
+        return res.status(400).json({
+          success: false,
+          message: "This opportunity is no longer accepting applications",
+        });
+      }
+
       const existingApplication = await Application.findOne({
         opportunity_id: opportunityId,
         volunteer_id: req.user._id,

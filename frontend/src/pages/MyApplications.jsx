@@ -123,13 +123,6 @@ export default function MyApplications() {
                       <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${getStatusBadgeClass(app.status)}`}>
                         {app.status}
                       </div>
-                      
-                      {app.status === 'accepted' && (
-                        <div className="text-sm font-medium text-green-600 flex items-center gap-1.5">
-                          <span className="flex items-center justify-center w-5 h-5 bg-green-100 rounded-full text-[10px]">✓</span> 
-                          Contacted
-                        </div>
-                      )}
                     </div>
                   </div>
                   

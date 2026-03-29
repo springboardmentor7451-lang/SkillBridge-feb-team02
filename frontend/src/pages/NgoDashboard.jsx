@@ -112,15 +112,6 @@ export default function NgoDashboard() {
                       <span>• {opp.applicantsCount || 0} applicants</span>
                       <span>• {new Date(opp.createdAt).toLocaleDateString()}</span>
                     </div>
-                    {opp.requiredSkills && opp.requiredSkills.length > 0 && (
-                      <div className="flex gap-2 mt-3 flex-wrap">
-                        {opp.requiredSkills.map((skill, index) => (
-                          <span key={index} className="px-2 py-1 bg-zinc-100 text-zinc-600 rounded text-xs font-medium">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                   </div>
                   <div className="flex gap-2 w-full md:w-auto justify-end">
                     <button

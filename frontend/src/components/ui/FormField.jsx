@@ -23,11 +23,11 @@ const FormField = ({
           value={value}
           onChange={onChange}
           required={required}
-          className="w-full border p-3 rounded-lg"
+          className="w-full border border-zinc-500/60 p-3 rounded-lg cursor-pointer"
         >
-          <option value="">Select {label}</option>
+          <option value="cursor-pointer">Select {label}</option>
           {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
+            <option className="cursor-pointer" key={opt.value} value={opt.value}>
               {opt.label}
             </option>
           ))}
@@ -43,7 +43,7 @@ const FormField = ({
           placeholder={placeholder}
           required={required}
           rows={rows}
-          className="w-full border p-3 rounded-lg resize-none"
+          className="w-full border border-zinc-500/60 p-3 rounded-lg resize-none"
         />
       )}
 
@@ -57,7 +57,7 @@ const FormField = ({
           onKeyDown={onKeyDown}
           placeholder={placeholder}
           required={required}
-          className="w-full border p-3 rounded-lg"
+          className="w-full border border-zinc-500/60 p-3 rounded-lg"
         />
       )}
     </div>
