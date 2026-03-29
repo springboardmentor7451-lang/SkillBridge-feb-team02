@@ -165,8 +165,7 @@ const SignupForm = ({ switchToLogin, onSuccess }) => {
       };
 
       await signup(payload);
-
-      loginUser({ email: form.email, password: form.password });
+      await loginUser({ email: form.email, password: form.password });
       onSuccess();
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed.");
@@ -260,7 +259,7 @@ const SignupForm = ({ switchToLogin, onSuccess }) => {
             <button
               type="button"
               onClick={() => setStep(step - 1)}
-              className="w-1/2 border border-slate-300 py-2 rounded-lg"
+              className="w-1/2 border border-slate-300 py-2 rounded-lg cursor-pointer"
             >
               Back
             </button>
@@ -270,7 +269,7 @@ const SignupForm = ({ switchToLogin, onSuccess }) => {
             <button
               type="button"
               onClick={handleNext}
-              className="w-full bg-slate-900 text-white py-2 rounded-lg"
+              className="w-full bg-slate-900 text-white py-2 rounded-lg cursor-pointer"
             >
               Continue
             </button>
@@ -278,7 +277,7 @@ const SignupForm = ({ switchToLogin, onSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-slate-900 text-white py-2 rounded-lg disabled:opacity-60"
+              className="w-full bg-slate-900 text-white py-2 rounded-lg disabled:opacity-60 cursor-pointer"
             >
               {loading ? "Creating..." : "Create Account"}
             </button>
@@ -288,7 +287,7 @@ const SignupForm = ({ switchToLogin, onSuccess }) => {
 
       <div className="mt-4 text-center text-sm text-slate-600">
         Already have an account?{" "}
-        <button onClick={switchToLogin} className="font-medium hover:underline">
+        <button onClick={switchToLogin} className="font-medium hover:underline cursor-pointer">
           Login
         </button>
       </div>

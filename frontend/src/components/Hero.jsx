@@ -1,7 +1,23 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import useAuth from "../context/useAuth";
 import DotGrid from "./ui/DotGrid";
 import { ChevronRight } from "lucide-react";
 
 const Hero = ({ openAuthModal }) => {
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.role === "ngo") {
+        navigate("/ngo");
+      } else if (user.role === "volunteer") {
+        navigate("/volunteer");
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
+
   return (
     <div className="w-full h-screen relative">
       <DotGrid

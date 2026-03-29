@@ -33,7 +33,7 @@ const Navbar = ({ openAuthModal, role }) => {
     <div className="relative">
       <nav className="w-[90%] mx-auto rounded-full flex justify-between items-center px-6 md:px-8 py-3 bg-white shadow-sm fixed top-7 left-1/2 -translate-x-1/2 z-40">
         <Link
-          to="/"
+          to={user?.role === "ngo" ? "/ngo" : "/volunteer"}
           onClick={closeMenu}
           className="text-2xl font-extrabold text-slate-900 tracking-tighter no-underline z-50"
         >

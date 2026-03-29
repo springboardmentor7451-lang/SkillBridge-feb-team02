@@ -16,7 +16,7 @@ export default function ApplicationManagement({ opportunity, onClose }) {
     setError(null);
     try {
       const response = await applicationService.getApplicationsByOpportunity(opportunity._id);
-      setApplications(response.data?.data || []);
+      setApplications(response.data || []);
     } catch (err) {
       setError(err?.message || err || "Failed to fetch applications");
       console.error("Error:", err);

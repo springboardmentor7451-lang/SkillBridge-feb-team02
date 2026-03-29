@@ -85,7 +85,7 @@ const LoginForm = ({ switchToSignup, onSuccess }) => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-slate-900 text-white py-2.5 rounded-lg font-medium transition-colors hover:bg-slate-800 disabled:opacity-60"
+          className="w-full bg-slate-900 text-white py-2.5 rounded-lg font-medium transition-colors hover:bg-slate-800 disabled:opacity-60 cursor-pointer"
         >
           {loading ? "Logging in..." : "Login"}
         </button>
@@ -95,7 +95,7 @@ const LoginForm = ({ switchToSignup, onSuccess }) => {
         Don't have an account?{" "}
         <button
           onClick={switchToSignup}
-          className="font-medium hover:underline"
+          className="font-medium hover:underline cursor-pointer"
         >
           Sign up
         </button>
