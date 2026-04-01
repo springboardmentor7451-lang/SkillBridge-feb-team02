@@ -5,6 +5,7 @@ const Application = require("../models/application");
 const Opportunity = require("../models/opportunity");
 const authMiddleware = require("../middleware/jwtAuth");
 const authorizeRole = require("../middleware/authorizeRole");
+const { sendNotification } = require("../services/socketService");
 
 router.get(
   "/opportunity/:opportunityId",
@@ -143,6 +144,13 @@ router.put(
         success: true,
         message: `Application ${status} successfully`,
         data: updatedApplication,
+      });
+
+      // Trigger Notification
+      sendNotification(updatedApplication.volunteer_id._id, {
+        type: "application_status",
+        message: `Your application for "${updatedApplication.opportunity_id.title}" has been ${status}.`,
+        related_id: updatedApplication._id,
       });
     } catch (error) {
       console.error("Error updating application status:", error);

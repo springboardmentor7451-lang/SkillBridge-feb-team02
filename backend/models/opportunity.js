@@ -43,6 +43,10 @@ const opportunitySchema = new mongoose.Schema(
   },
 );
 
+opportunitySchema.index({ status: 1 });
+opportunitySchema.index({ location: 1 });
+opportunitySchema.index({ required_skills: 1 });
+
 const OpportunityModel = mongoose.model("Opportunity", opportunitySchema);
 
 module.exports = OpportunityModel;
