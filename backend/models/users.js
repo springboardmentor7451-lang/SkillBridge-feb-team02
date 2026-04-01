@@ -41,5 +41,9 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+userSchema.index({ role: 1 });
+userSchema.index({ location: 1 });
+userSchema.index({ skills: 1 });
+
 const UserModel = mongoose.model("User", userSchema);
 module.exports = UserModel;
