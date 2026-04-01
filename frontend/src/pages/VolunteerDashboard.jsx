@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Star, MessageSquare, Search } from "lucide-react";
 import useAuth from "../context/useAuth";
 import opportunityService from "../services/opportunityService";
 
@@ -49,10 +50,24 @@ export default function VolunteerDashboard() {
             </button>
 
             <button
-              onClick={() => navigate('/opportunities')}
-              className="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-900 bg-transparent hover:bg-slate-50 transition-colors"
+              onClick={() => navigate('/matches')}
+              className="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-900 bg-transparent hover:bg-slate-50 transition-colors flex items-center gap-2"
             >
-              Browse Opportunities
+              <Star size={18} className="text-amber-500" /> My Matches
+            </button>
+
+            <button
+              onClick={() => navigate('/opportunities')}
+              className="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-900 bg-transparent hover:bg-slate-50 transition-colors flex items-center gap-2"
+            >
+              <Search size={18} className="text-slate-400" /> Browse Opportunities
+            </button>
+
+            <button
+              onClick={() => navigate('/chat')}
+              className="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-900 bg-transparent hover:bg-slate-50 transition-colors flex items-center gap-2"
+            >
+              <MessageSquare size={18} className="text-indigo-500" /> Messages
             </button>
           </nav>
         </div>

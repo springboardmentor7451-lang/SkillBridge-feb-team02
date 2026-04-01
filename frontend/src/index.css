@@ -8,3 +8,7 @@ body {
   font-family: "Bricolage Grotesque", sans-serif;
   background-color: #F4F4F5;
 }
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+}

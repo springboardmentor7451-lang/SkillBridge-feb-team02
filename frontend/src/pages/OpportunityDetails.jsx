@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { MessageSquare } from "lucide-react";
 import useAuth from "../context/useAuth";
 import opportunityService from "../services/opportunityService";
 import applicationService from "../services/applicationService";
@@ -180,19 +181,23 @@ export default function OpportunityDetails() {
             </div>
 
             {user?.role === "volunteer" ? (
-              <button
-                onClick={() => !isApplied && setShowApplyModal(true)}
-                disabled={isApplied || opportunity.status !== 'open'}
-                className={`w-full py-4 rounded-xl font-bold text-white transition-all shadow-lg ${
-                  isApplied 
-                    ? "bg-green-500 cursor-default shadow-green-100" 
-                    : opportunity.status !== 'open'
-                      ? "bg-slate-300 cursor-not-allowed shadow-none"
-                      : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-100 hover:shadow-indigo-200 active:scale-[0.98]"
-                }`}
-              >
-                {isApplied ? "✓ Applied Successfully" : opportunity.status !== 'open' ? "Opportunity Closed" : "Apply Now"}
-              </button>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => !isApplied && setShowApplyModal(true)}
+                  disabled={isApplied || opportunity.status !== 'open'}
+                  className={`w-full py-4 rounded-xl font-bold text-white transition-all shadow-lg ${
+                    isApplied 
+                      ? "bg-green-500 cursor-default shadow-green-100" 
+                      : opportunity.status !== 'open'
+                        ? "bg-slate-300 cursor-not-allowed shadow-none"
+                        : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-100 hover:shadow-indigo-200 active:scale-[0.98]"
+                  }`}
+                >
+                  {isApplied ? "✓ Applied Successfully" : opportunity.status !== 'open' ? "Opportunity Closed" : "Apply Now"}
+                </button>
+                
+
+              </div>
             ) : user?.role === "ngo" ? (
               <div className="p-4 bg-slate-50 rounded-2xl text-center">
                 <p className="text-sm text-slate-500 font-medium italic">

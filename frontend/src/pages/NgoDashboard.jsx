@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { MessageSquare, Star } from "lucide-react";
 import useAuth from "../context/useAuth";
 import opportunityService from "../services/opportunityService";
 import ApplicationManagement from "../components/ApplicationManagement";
+import VolunteerMatching from "../components/VolunteerMatching";
 
 export default function NgoDashboard() {
   const { user } = useAuth();
@@ -13,6 +15,7 @@ export default function NgoDashboard() {
   const [opportunityToDelete, setOpportunityToDelete] = useState(null);
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
   const [showApplicationsModal, setShowApplicationsModal] = useState(false);
+  const [showMatchingModal, setShowMatchingModal] = useState(false);
 
   useEffect(() => {
     fetchOpportunities();
@@ -78,12 +81,20 @@ export default function NgoDashboard() {
               {user.organization_description || user.organizationDetails || user.bio || "No organization details provided."}
             </p>
           </div>
-          <button
-            onClick={() => navigate("/opportunities/create")}
-            className="w-full md:w-auto px-6 py-3 rounded-xl font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors shrink-0"
-          >
-            + Create Opportunity
-          </button>
+          <div className="flex flex-col md:flex-row gap-3 shrink-0 w-full md:w-auto">
+            <button
+              onClick={() => navigate("/chat")}
+              className="px-6 py-3 rounded-xl font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors border-none cursor-pointer flex items-center justify-center gap-2"
+            >
+              <MessageSquare size={18} /> View Messages
+            </button>
+            <button
+              onClick={() => navigate("/opportunities/create")}
+              className="px-6 py-3 rounded-xl font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors border-none cursor-pointer shadow-sm shadow-slate-200"
+            >
+              + Create Opportunity
+            </button>
+          </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
@@ -97,7 +108,7 @@ export default function NgoDashboard() {
               <div className="p-8 text-center text-slate-500">
                 You haven't posted any opportunities yet.
                 <button onClick={() => navigate("/opportunities/create")} className="block mx-auto mt-4 text-indigo-600 hover:underline">
-                  Create your first opportunity
+                   Create your first opportunity
                 </button>
               </div>
             ) : (
@@ -114,6 +125,15 @@ export default function NgoDashboard() {
                     </div>
                   </div>
                   <div className="flex gap-2 w-full md:w-auto justify-end">
+                    <button
+                      onClick={() => {
+                        setSelectedOpportunity(opp);
+                        setShowMatchingModal(true);
+                      }}
+                      className="px-4 py-2 text-sm font-medium text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors flex items-center gap-1.5"
+                    >
+                      <Star size={14} /> Find Matches
+                    </button>
                     <button
                       onClick={() => {
                         setSelectedOpportunity(opp);
@@ -178,6 +198,15 @@ export default function NgoDashboard() {
           opportunity={selectedOpportunity}
           onClose={() => {
             setShowApplicationsModal(false);
+            setSelectedOpportunity(null);
+          }}
+        />
+      )}
+      {showMatchingModal && selectedOpportunity && (
+        <VolunteerMatching
+          opportunity={selectedOpportunity}
+          onClose={() => {
+            setShowMatchingModal(false);
             setSelectedOpportunity(null);
           }}
         />

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import AuthProvider from "./context/AuthProvider";
+import { SocketProvider } from "./context/SocketProvider";
 import AuthModal from "./components/Auth/AuthModal";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -13,6 +15,8 @@ import CreateOpportunity from "./pages/CreateOpportunity";
 import EditOpportunity from "./pages/EditOpportunity";
 import ProfileEdit from "./components/ProfileEdit";
 import MyApplications from "./pages/MyApplications";
+import Matches from "./pages/Matches";
+import Chat from "./pages/Chat";
 import useAuth from "./context/useAuth";
 import OpportunityDetails from "./pages/OpportunityDetails";
 
@@ -111,6 +115,22 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/matches"
+          element={
+            <ProtectedRoute>
+              <Matches />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
       <AuthModal
@@ -125,7 +145,12 @@ const AppContent = () => {
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <SocketProvider>
+        <div className="flex flex-col min-h-screen">
+          <AppContent />
+        </div>
+        <Toaster position="bottom-right" reverseOrder={false} />
+      </SocketProvider>
     </AuthProvider>
   );
 }
