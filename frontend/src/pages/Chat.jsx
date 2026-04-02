@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { Send, User as UserIcon, Check, CheckCheck, MessageSquare, Star } from "lucide-react";
+import { Send, User as UserIcon, Check, CheckCheck, MessageSquare, Star, ArrowLeft } from "lucide-react";
 import { getConversationHistory, getConversations } from "../services/messageService";
 import { useSocket } from "../context/SocketProvider";
 import useAuth from "../context/useAuth";
@@ -12,6 +12,7 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showChatList, setShowChatList] = useState(true);
   
   const { socket } = useSocket();
   const { user: currentUser } = useAuth();
@@ -147,11 +148,11 @@ const Chat = () => {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100 pt-32 px-4 pb-12">
-      <div className="max-w-6xl mx-auto h-[calc(100vh-180px)] min-h-[600px] flex shadow-2xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white border border-slate-100">
+    <div className="min-h-screen bg-zinc-100 pt-24 md:pt-32 px-0 md:px-4 pb-0 md:pb-12">
+      <div className="max-w-7xl mx-auto h-[calc(100vh-96px)] md:h-[calc(100vh-180px)] md:min-h-[600px] flex md:shadow-2xl md:shadow-slate-200/50 md:rounded-3xl overflow-hidden bg-white md:border md:border-slate-100">
         
         {/* Sidebar */}
-        <div className="w-80 md:w-96 border-r border-slate-100 flex flex-col bg-white">
+        <div className={`w-full md:w-80 lg:w-96 border-r border-slate-100 flex flex-col bg-white ${!showChatList ? 'hidden md:flex' : 'flex'}`}>
           <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
             <h2 className="text-xl font-bold text-slate-900 tracking-tight">Messages</h2>
           </div>
@@ -170,7 +171,10 @@ const Chat = () => {
                 return (
                   <div
                     key={conv.user._id}
-                    onClick={() => setActiveConversation(conv.user)}
+                    onClick={() => {
+                      setActiveConversation(conv.user);
+                      setShowChatList(false);
+                    }}
                     className={`p-4 flex items-center gap-4 cursor-pointer transition-all relative group ${
                       isActive
                         ? "bg-indigo-50/50"
@@ -210,12 +214,18 @@ const Chat = () => {
         </div>
 
         {/* Main Chat Panel */}
-        <div className="flex-1 flex flex-col bg-slate-50/30 relative">
+        <div className={`flex-1 flex flex-col bg-slate-50/30 relative ${showChatList ? 'hidden md:flex' : 'flex'}`}>
           {activeConversation ? (
             <>
               {/* Header */}
-              <div className="p-4 px-8 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between sticky top-0 z-10">
-                <div className="flex items-center gap-4">
+              <div className="p-4 px-6 md:px-8 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between sticky top-0 z-10">
+                <div className="flex items-center gap-3 md:gap-4">
+                  <button 
+                    onClick={() => setShowChatList(true)}
+                    className="md:hidden p-2 -ml-2 text-slate-500 hover:text-slate-900 transition-colors"
+                  >
+                    <ArrowLeft size={20} />
+                  </button>
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xs shadow-inner ${
                     activeConversation.role === 'ngo' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-400'
                   }`}>
@@ -230,7 +240,7 @@ const Chat = () => {
               </div>
 
               {/* Messages Area */}
-              <div className="flex-1 overflow-y-auto p-8 custom-scrollbar scrollbar-thin flex flex-col gap-6">
+              <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar scrollbar-thin flex flex-col gap-4 md:gap-6">
                 {messages.length === 0 && (
                   <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
                      <div className="w-16 h-16 bg-white rounded-3xl shadow-sm flex items-center justify-center mb-4 transition-transform hover:scale-110">

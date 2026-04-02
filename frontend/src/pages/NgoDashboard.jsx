@@ -124,7 +124,7 @@ export default function NgoDashboard() {
                       <span>• {new Date(opp.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
-                  <div className="flex gap-2 w-full md:w-auto justify-end">
+                  <div className="flex flex-wrap gap-2 w-full md:w-auto justify-end">
                     <button
                       onClick={() => {
                         setSelectedOpportunity(opp);
