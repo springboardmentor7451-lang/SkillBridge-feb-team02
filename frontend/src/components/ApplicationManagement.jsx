@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { MessageSquare } from "lucide-react";
 import applicationService from "../services/applicationService";
 
 export default function ApplicationManagement({ opportunity, onClose }) {
@@ -10,6 +12,8 @@ export default function ApplicationManagement({ opportunity, onClose }) {
   useEffect(() => {
     fetchApplications();
   }, [opportunity._id]);
+
+  const navigate = useNavigate();
 
   const fetchApplications = async () => {
     setLoading(true);
@@ -159,6 +163,16 @@ export default function ApplicationManagement({ opportunity, onClose }) {
                     </div>
 
                     <div className="flex gap-2 md:flex-col items-end">
+                      <button
+                        onClick={() => {
+                          onClose();
+                          navigate("/chat", { state: { targetUser: app.volunteer_id } });
+                        }}
+                        className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-2"
+                      >
+                        <MessageSquare size={16} /> Chat
+                      </button>
+
                       {app.status === "pending" && (
                         <>
                           <button
